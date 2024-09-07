@@ -1,0 +1,15 @@
+﻿@using System.Security.Claims
+@using MeChat.Views.Chat
+@using Microsoft.AspNetCore.Identity
+@{
+    UserManager<User>? userManager = Context.RequestServices.GetService<UserManager<User>>();
+    User? me = await userManager?.GetUserAsync(new ClaimsPrincipal(User.Identity));
+}
+
+<main>
+    Welcome, @me.UserName
+    
+    <div>
+        
+    </div>
+</main>
