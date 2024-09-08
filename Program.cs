@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,16 +29,17 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration.GetSection("DiscordKeys:ClientSecret").Value;
 });
 
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddRazorPages();
-builder.Services.AddSignalR();
-builder.Services.AddControllersWithViews();
-
+// builder.Services.AddSignalR();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+});
+builder.Services.AddServerSideBlazor();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDataContext>()
-    .AddApiEndpoints();
+    .AddEntityFrameworkStores<ApplicationDataContext>();
 builder.Services.AddDbContext<ApplicationDataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
@@ -60,8 +62,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 app.MapRazorPages();
-app.MapGroup("/api").MapIdentityApi<User>();
+app.MapBlazorHub();
+app.MapIdentityApi<User>();
 app.MapDefaultControllerRoute();
-app.MapHub<ChatHub>("/hub/chat");
+// app.MapHub<ChatHub>("/hub/chat");
 
 app.Run();
