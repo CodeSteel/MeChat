@@ -1,4 +1,4 @@
-﻿@model IndexChat;
+﻿@model IndexResult;
 
 @{
     ChatGroup? selectedGroup = Model?.SelectedGroup;
@@ -22,6 +22,8 @@
             });
         }
     </script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
 }
 
 <div class="flex justify-between h-full">
@@ -60,7 +62,7 @@
             <div>
                 <p class="text-2xl mb-2">@selectedGroup.Name</p>
             </div>
-            <div class=" h-full mb-4 overflow-y-scroll p-2 scrollbar">
+            <div id="chatbox" class=" h-full mb-4 overflow-y-scroll p-2 scrollbar">
                 @foreach (Chat chat in selectedGroup.Chats)
                 {
                     <p class="flex items-center space-x-1 ">
@@ -75,7 +77,7 @@
             </div>
             <div id="messageForm" class="w-full flex space-x-5">
                 <input id="messageInput" placeholder="type something..." type="text" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl w-full" />
-                <button onclick="sendMessage()" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl h-full w-fit px-24">Send</button>
+                <button type="button" id="sendMessage" onclick="sendMessage()" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl h-full w-fit px-24">Send</button>
             </div>
         }
     </div>

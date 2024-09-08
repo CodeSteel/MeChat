@@ -48,7 +48,7 @@ public class HomeController : Controller
             .Collection(b => b.Chats)
             .LoadAsync();
 
-        IndexChat newIndex = new IndexChat()
+        IndexResult newIndex = new IndexResult()
         {
             Selection = groupId ?? Guid.Empty,
             GroupsWithUser = groupsWithUser,
@@ -64,7 +64,7 @@ public class HomeController : Controller
     }
 
     [Authorize]
-    public IActionResult FindGroup(ChatGroupCollection? groupCollection)
+    public IActionResult FindGroup(FindGroupResult? groupCollection)
     {
         List<ChatGroup> publicGroups;
         if (groupCollection != null && !string.IsNullOrEmpty(groupCollection.Search))
@@ -76,7 +76,7 @@ public class HomeController : Controller
             publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Public).ToList() ?? new List<ChatGroup>();
         }
         
-        return View(new ChatGroupCollection()
+        return View(new FindGroupResult()
         {
             ChatGroups = publicGroups
         });

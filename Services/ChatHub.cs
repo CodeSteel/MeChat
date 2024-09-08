@@ -1,13 +1,26 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using MeChat.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 
 namespace MeChat.Services;
 
-[Authorize]
 public class ChatHub : Hub
 {
-    public async Task Send(Guid userId, string message)
+    private readonly UserManager<User> _userManager;
+    
+    public ChatHub(UserManager<User> userManager)
     {
-        await Clients.All.SendAsync("ReceiveMessage", userId, message);
+        _userManager = userManager;
+    }
+    
+    public async Task Send(string message)
+    {
+        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(Context.User.Identity));
+        if (user != null)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", user.DisplayName, DateTime.Now.ToUniversalTime().ToString("M/d/yyyy h:mm:ss tt"), message);
+        }
     }
 }

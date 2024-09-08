@@ -31,7 +31,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddRazorPages();
-// builder.Services.AddSignalR();
+builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -65,6 +65,6 @@ app.UseAntiforgery();
 app.MapRazorPages();
 app.MapBlazorHub();
 app.MapDefaultControllerRoute();
-// app.MapHub<ChatHub>("/hub/chat");
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

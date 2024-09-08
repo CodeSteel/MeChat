@@ -37,12 +37,17 @@ public class ChatController : Controller
             return BadRequest($"Failed to get request user.");
         }
         
-        ChatGroup? group = await _dataContext.ChatGroups.FindAsync(request.GroupId);
+        ChatGroup? group = await _dataContext.ChatGroups.Include(x => x.Users).FirstOrDefaultAsync(x => x.Id == request.GroupId);
         if (group == null)
         {
             return BadRequest($"Couldn't find ChatGroup with Id: '{request.GroupId}'.");
         }
 
+        if (group.Users.FirstOrDefault(x => x.Id == requestUser.Id) == null)
+        {
+            return BadRequest($"User is not in group.");
+        }
+        
         Chat newChat = new Chat()
         {
             Id = Guid.NewGuid(),

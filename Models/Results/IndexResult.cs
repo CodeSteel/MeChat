@@ -1,6 +1,6 @@
 ﻿namespace MeChat.Models;
 
-public class IndexChat
+public class IndexResult
 {
     public Guid Selection { get; set; }
     public IList<ChatGroup> GroupsWithUser { get; set; }
