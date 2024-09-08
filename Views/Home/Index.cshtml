@@ -1,32 +1,37 @@
-﻿@using System.Security.Claims
-@using MeChat.Contexts
-@using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
-@inject UserManager<User> userManager;
-@{
-    userManager = Context.RequestServices.GetService<UserManager<User>>();
-    User? me = await userManager?.GetUserAsync(new ClaimsPrincipal(User.Identity));
-    ApplicationDataContext? appDbContext = Context.RequestServices.GetService<ApplicationDataContext>();
-    List<ChatGroup> groupsWithUser = new List<ChatGroup>();
-    Guid meId = me?.Id ?? Guid.Empty;
-    if (meId != Guid.Empty)
-    {
-        groupsWithUser = appDbContext?.ChatGroups.Include(x => x.Users)
-            .Where(x => x.Users.Any(x => x.Id == meId))
-            .ToList();
-    }
+﻿@model IndexChat;
 
-    ChatGroup? selectedGroup = groupsWithUser.Count > 0 ? groupsWithUser[0] : null;
+@{
+    ChatGroup? selectedGroup = Model?.SelectedGroup;
+    IList<ChatGroup> groupsWithUser = (Model != null && Model.GroupsWithUser != null ? Model.GroupsWithUser : new List<ChatGroup>());
+}
+
+@section Scripts
+{
+    <script>
+        const messageInput = document.getElementById("messageInput");
+        const sendMessage = () =>
+        {
+            if (messageInput.value === "") return;
+            $.ajax({
+                url: '@Url.Action("SendMessage", "Chat")',
+                type: 'POST',
+                data: {
+                    GroupId: "@selectedGroup?.Id",
+                    Body: messageInput.value
+                }
+            });
+        }
+    </script>
 }
 
 <div class="flex justify-between h-full">
     <div class="w-[250px] relative h-full bg-brand-900 border-r border-brand-100/[0.1] shadow-xl">
         <div class="groups">
-            @foreach (ChatGroup group in groupsWithUser)
+            @foreach (var group in groupsWithUser)
             {
-                <div class="px-5 h-[60px] flex flex-col bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
+                <a asp-action="Index" asp-controller="Home" asp-route-groupId="@group.Id" class="px-5 h-[60px] flex flex-col bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
                     <p class="text-white text-2xl my-auto">@group.Name</p>
-                </div>
+                </a>
             }
             <br/>
             <a asp-action="CreateGroup" asp-controller="Home" class="w-full px-5 h-[60px] flex flex-col bg-brand-900 border-b border-t border-brand-50/[0.2] shadow-md">
@@ -56,21 +61,21 @@
                 <p class="text-2xl mb-2">@selectedGroup.Name</p>
             </div>
             <div class=" h-full mb-4 overflow-y-scroll p-2 scrollbar">
-                @for (int i = 0; i < 200; i++)
+                @foreach (Chat chat in selectedGroup.Chats)
                 {
                     <p class="flex items-center space-x-1 ">
-                        <span class="text-true-gray-400 text-sm">9:03 PM</span>
+                        <span class="text-true-gray-400 text-sm">@chat.CreatedAt</span>
                         <a class="flex items-center space-x-2">
                             <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
-                            <span class="text-lg font-bold">Isaac: </span>
+                            <span class="text-lg font-bold">@chat.PostedBy.DisplayName: </span>
                         </a>
-                        <span class="text-md">Text</span>
+                        <span class="text-md">@chat.Body</span>
                     </p>
                 }
             </div>
-            <div class="w-full flex space-x-5">
-                <input placeholder="type something..." type="text" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl w-full" />
-                <input type="Submit" value="Send" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl h-full w-fit px-24" />
+            <div id="messageForm" class="w-full flex space-x-5">
+                <input id="messageInput" placeholder="type something..." type="text" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl w-full" />
+                <button onclick="sendMessage()" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl h-full w-fit px-24">Send</button>
             </div>
         }
     </div>
@@ -87,7 +92,7 @@
                         </div>
                     }
                 </div>
-                <form asp-controller="Home" asp-action="LeaveGroup" asp-route-groupId=@selectedGroup.Id>
+                <form asp-controller="Chat" asp-action="LeaveGroup" asp-route-groupId=@selectedGroup.Id>
                     <button type="submit" class="w-full px-5 h-[60px] flex flex-col bg-brand-900 border-b border-t border-brand-50/[0.2] shadow-md">
                         <div class="text-white text-2xl my-auto flex flex-row items-center space-x-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">

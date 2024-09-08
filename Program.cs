@@ -3,7 +3,6 @@ using MeChat.Models;
 using MeChat.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -58,12 +57,13 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+
 app.MapRazorPages();
 app.MapBlazorHub();
-app.MapIdentityApi<User>();
 app.MapDefaultControllerRoute();
 // app.MapHub<ChatHub>("/hub/chat");
 

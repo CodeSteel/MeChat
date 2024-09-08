@@ -1,13 +1,10 @@
 using System.Diagnostics;
-using System.Security.Claims;
 using MeChat.Contexts;
 using Microsoft.AspNetCore.Mvc;
 using MeChat.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace MeChat.Controllers;
 
@@ -23,14 +20,41 @@ public class HomeController : Controller
         _dataContext = dataContext;
         _userManager = userManager;
     }
-
-    public IActionResult Index()
+    
+    public async Task<IActionResult> Index(Guid? groupId)
     {
         if (!User.Identity.IsAuthenticated)
         {
             return Redirect("/Identity/Account/Login");
         }
-        return View();
+        
+        User? user = await _dataContext.Users.Include(x => x.ChatGroups).ThenInclude(x => x.Users).FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+        if (user == null)
+        {
+            return View();
+        }
+
+        List<ChatGroup> groupsWithUser = user.ChatGroups.ToList();
+        ChatGroup selectedGroup = groupsWithUser[0];
+        
+        if (groupId != null)
+        {
+            ChatGroup? group = groupsWithUser.FirstOrDefault(x => x.Id == groupId);
+            if (group != null)
+                selectedGroup = group;
+        }
+        
+        await _dataContext.Entry(selectedGroup)
+            .Collection(b => b.Chats)
+            .LoadAsync();
+
+        IndexChat newIndex = new IndexChat()
+        {
+            Selection = groupId ?? Guid.Empty,
+            GroupsWithUser = groupsWithUser,
+            SelectedGroup = selectedGroup
+        };
+        return View(newIndex);
     }
 
     [Authorize]
@@ -40,37 +64,22 @@ public class HomeController : Controller
     }
 
     [Authorize]
-    public IActionResult FindGroup()
+    public IActionResult FindGroup(ChatGroupCollection? groupCollection)
     {
-        return View();
-    }
-    
-    [Authorize]
-    public async Task<IActionResult> LeaveGroup(Guid groupId)
-    {
-        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
-        if (user != null)
+        List<ChatGroup> publicGroups;
+        if (groupCollection != null && !string.IsNullOrEmpty(groupCollection.Search))
         {
-            _logger.LogInformation($"GroupId={groupId}");
-            ChatGroup? requestedGroup = await _dataContext.ChatGroups.Include(x => x.Users)
-                .FirstOrDefaultAsync(x => x.Id == groupId);
-            if (requestedGroup != null)
-            {
-                _logger.LogInformation($"UserCount: {requestedGroup.Users.Count}");
-                User? foundUser = requestedGroup.Users.FirstOrDefault(x => x.Id == user.Id);
-                if (foundUser != null)
-                {
-                    _dataContext.ChatGroups.Update(requestedGroup);
-                    requestedGroup.Users.Remove(user);
-                    await _dataContext.SaveChangesAsync();
-                }
-            }
-            else
-            {
-                _logger.LogInformation($"GROUP IS NULL");
-            }
+            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Public && x.Name.ToLower().Contains(groupCollection.Search.ToLower())).ToList() ?? new List<ChatGroup>();
         }
-        return RedirectToAction("Index");
+        else
+        {
+            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Public).ToList() ?? new List<ChatGroup>();
+        }
+        
+        return View(new ChatGroupCollection()
+        {
+            ChatGroups = publicGroups
+        });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

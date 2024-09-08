@@ -1,5 +1,4 @@
 ﻿using MailKit.Net.Smtp;
-using MeChat.Controllers;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
 

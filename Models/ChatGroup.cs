@@ -8,6 +8,8 @@ public class ChatGroup
     public Guid Id { get; set; }
     
     public string Name { get; set; }
+    
+    public bool Public { get; set; }
 
     public ICollection<Chat> Chats { get; } = new List<Chat>();
 
