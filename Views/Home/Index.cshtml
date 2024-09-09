@@ -67,10 +67,19 @@
                 {
                     <p class="flex items-center space-x-1 ">
                         <span class="text-true-gray-400 text-sm">@chat.CreatedAt</span>
-                        <a asp-action="Profile" asp-controller="Account" asp-route-userId="@chat.PostedBy.Id" class="flex items-center space-x-2">
-                            <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
-                            <span class="text-lg font-bold">@chat.PostedBy.DisplayName: </span>
-                        </a>
+                        @if (chat.PostedBy != null)
+                        {
+                            <a asp-action="Profile" asp-controller="Account" asp-route-userId="@chat.PostedBy.Id" class="flex items-center space-x-2">
+                                <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
+                                <span class="text-lg font-bold @(chat.PostedBy.Email == User.Identity.Name?"text-brand-500":"")">@chat.PostedBy.DisplayName: </span>
+                            </a>
+                        }
+                        else
+                        {
+                            <span>
+                                <strong class="ml-4">Chat:</strong>
+                            </span>
+                        }
                         <span class="text-md">@chat.Body</span>
                     </p>
                 }
@@ -101,8 +110,10 @@
                     {
                         @if (selectedGroup.Owner.Id != user.Id)
                         {
-                            <a asp-controller="Account" asp-action="Profile" asp-route-userId="@user.Id" class="px-5 h-[60px] flex flex-row items-center space-x-2 bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
-                                <p class="text-white  my-auto">@user.DisplayName</p>
+                            <a asp-controller="Account" asp-action="Profile" asp-route-userId="@user.Id" class="px-5 h-[60px] flex flex-row items-center space-x-2 bg-brand-900 shadow-md">
+                                <div>
+                                    <p class="text-white ">@user.DisplayName</p>
+                                </div>
                             </a>
                         }
                     }

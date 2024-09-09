@@ -56,6 +56,22 @@ public class HomeController : Controller
         return View(newIndex);
     }
 
+    public async Task<IActionResult> Dashboard()
+    {
+        AppStatistic? appStatistic = await _dataContext.AppStatistics.FirstOrDefaultAsync();
+        if (appStatistic == null)
+        {
+            return View();
+        }
+        DashboardResults results = new DashboardResults()
+        {
+            GroupCount = appStatistic.GroupsCreated,
+            UserCount = appStatistic.UsersCreated,
+            ChatCount = appStatistic.ChatsCreated
+        };
+        return View(results);
+    }
+
     [Authorize]
     public IActionResult CreateGroup()
     {

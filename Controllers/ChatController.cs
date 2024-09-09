@@ -61,6 +61,11 @@ public class ChatController : Controller
             Group = group,
             PostedBy = requestUser
         };
+        
+        AppStatistic stats = await _dataContext.AppStatistics.FirstAsync();
+        _dataContext.Update(stats);
+        
+        stats.ChatsCreated++;
 
         await _dataContext.Chats.AddAsync(newChat);
         await _dataContext.SaveChangesAsync();
@@ -96,6 +101,11 @@ public class ChatController : Controller
             Owner = requestUser
         };
         newChatGroup.Users.Add(requestUser);
+        
+        AppStatistic stats = await _dataContext.AppStatistics.FirstAsync();
+        _dataContext.Update(stats);
+        
+        stats.GroupsCreated++;
 
         await _dataContext.ChatGroups.AddAsync(newChatGroup);
         await _dataContext.SaveChangesAsync();
@@ -121,6 +131,14 @@ public class ChatController : Controller
                     {
                         _dataContext.ChatGroups.Update(requestedGroup);
                         requestedGroup.Users.Remove(user);
+                        
+                        Chat leaveChat = new Chat()
+                        {
+                            Group = requestedGroup,
+                            Body = $"{user.DisplayName} left the group."
+                        };
+
+                        await _dataContext.Chats.AddAsync(leaveChat);
                     }
                     else
                     {
@@ -150,6 +168,14 @@ public class ChatController : Controller
                 {
                     _dataContext.ChatGroups.Update(requestedGroup);
                     requestedGroup.Users.Add(user);
+
+                    Chat welcomeChat = new Chat()
+                    {
+                        Group = requestedGroup,
+                        Body = $"{user.DisplayName} joined the group."
+                    };
+
+                    await _dataContext.Chats.AddAsync(welcomeChat);
                     await _dataContext.SaveChangesAsync();
                 }
                 else

@@ -1,6 +1,6 @@
 ﻿var connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 var chatbox = document.getElementById("chatbox");
-
+let msg;
 
 connection.on("ReceiveMessage", function (username, userId, createdAt, message) {
     var item = document.createElement("p");
@@ -28,6 +28,11 @@ connection.on("ReceiveMessage", function (username, userId, createdAt, message) 
     
     var nameSpan = document.createElement("span");
     nameSpan.className = "text-lg font-bold";
+    if (msg == message)
+    {
+        nameSpan.className += " text-brand-500";
+        msg = "";
+    }
     nameSpan.textContent = username + ": ";
     
     link.appendChild(nameSpan);
@@ -43,11 +48,11 @@ connection.on("ReceiveMessage", function (username, userId, createdAt, message) 
     chatbox.scrollTop = chatbox.scrollHeight;
 });
 
-connection.start();
-
 document.getElementById("sendMessage").addEventListener("click", function (event) {
     var messageInput = document.getElementById("messageInput");
+    if (messageInput.value.trim() === "") return;
     
+    msg = messageInput.value;
     connection.invoke("Send", messageInput.value);
     event.preventDefault();
     messageInput.value = "";
@@ -63,7 +68,7 @@ function keyPress(e){
     }
 }
 
+connection.start();
 chatbox.scrollTop = chatbox.scrollHeight;
-
 document.getElementById("messageInput").focus();
 

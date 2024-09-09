@@ -11,6 +11,7 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
     
     public DbSet<ChatGroup> ChatGroups { get; set; }
     public DbSet<Chat> Chats { get; set; }
+    public DbSet<AppStatistic> AppStatistics { get; set; }
 
     public ApplicationDataContext(DbContextOptions<ApplicationDataContext> options, IConfiguration configuration) : base(options)
     {
@@ -48,6 +49,11 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
             ent.HasKey(e => e.Id);
             ent.HasMany(e => e.ChatGroups)
                 .WithMany(e => e.Users);
+        });
+
+        modelBuilder.Entity<AppStatistic>(ent =>
+        {
+            ent.HasKey(e => e.Id);
         });
         
         base.OnModelCreating(modelBuilder);

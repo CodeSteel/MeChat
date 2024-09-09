@@ -34,6 +34,7 @@ public class AccountController : Controller
         User? user = await _dataContext.Users
             .Include(x => x.Friends)
             .Include(x => x.ChatGroups)
+            .ThenInclude(x => x.Users)
             .FirstOrDefaultAsync(x => x.Id == userId);
         return View(user);
     }

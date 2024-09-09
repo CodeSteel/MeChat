@@ -10,7 +10,7 @@
 </head>
 <body class="bg-brand-950 relative h-full">
 
-<div class=" top-0 z-40 h-[60px] w-full px-5 items-center text-white backdrop-blur lg:z-50 lg:border-b border-brand-50/[0.06] supports-backdrop-blur:bg-white/95 shadow-lg">
+<div class=" top-0 z-40 h-[60px] w-full px-5 items-center text-white backdrop-blur lg:z-50 border-b border-brand-50/[0.06] supports-backdrop-blur:bg-white/95 shadow-lg">
     <ul class="flex flex-row justify-between h-full items-center">
         <li>
             <a asp-controller="Home" asp-action="Index" class="font-bold text-white text-lg flex flex-row items-center space-x-2">
@@ -20,14 +20,17 @@
                 <p>MeChat</p>
             </a>
         </li>
-        <li>
-            <a asp-controller="Account" asp-action="Index" class="text-white duration-300 transition-all hover:text-true-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" class="bi bi-person-circle" viewBox="0 0 16 16">
-                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                </svg>
-            </a>
-        </li>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li>
+                <a asp-controller="Account" asp-action="Index" class="text-white duration-300 transition-all hover:text-true-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                    </svg>
+                </a>
+            </li>
+        }
     </ul>
 </div>
 

@@ -3,6 +3,7 @@ using System;
 using MeChat.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeChat.Migrations
 {
     [DbContext(typeof(ApplicationDataContext))]
-    partial class ApplicationDataContextModelSnapshot : ModelSnapshot
+    [Migration("20240909024204_setPostedByNullable")]
+    partial class setPostedByNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,28 +38,6 @@ namespace MeChat.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("ChatGroupUser");
-                });
-
-            modelBuilder.Entity("MeChat.Models.AppStatistic", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChatsCreated")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("GroupsCreated")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsersCreated")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AppStatistics");
                 });
 
             modelBuilder.Entity("MeChat.Models.Chat", b =>
