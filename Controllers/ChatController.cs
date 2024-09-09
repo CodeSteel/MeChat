@@ -136,7 +136,7 @@ public class ChatController : Controller
     
     [HttpPost("group/join")]
     [Authorize]
-    public async Task<IActionResult> JoinGroup(Guid groupId)
+    public async Task<IActionResult> JoinGroup(Guid groupId, string? redirectUrl)
     {
         User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
         if (user != null)
@@ -154,11 +154,11 @@ public class ChatController : Controller
                 }
                 else
                 {
-                    return RedirectToAction("FindGroup", "Home");
+                    return redirectUrl != null ? Redirect(redirectUrl) : RedirectToAction("FindGroup", "Home");
                 }
             }
         }
 
-        return RedirectToAction("Index", "Home", new {GroupId = groupId});
+        return redirectUrl != null ? Redirect(redirectUrl) : RedirectToAction("Index", "Home", new {GroupId = groupId});
     }
 }
