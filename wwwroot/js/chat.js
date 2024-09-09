@@ -1,7 +1,8 @@
 ﻿var connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 var chatbox = document.getElementById("chatbox");
 
-connection.on("ReceiveMessage", function (username, createdAt, message) {
+
+connection.on("ReceiveMessage", function (username, userId, createdAt, message) {
     var item = document.createElement("p");
     item.className = "flex items-center space-x-1"
     
@@ -13,7 +14,8 @@ connection.on("ReceiveMessage", function (username, createdAt, message) {
 
     var link = document.createElement("a");
     link.className = "flex items-center space-x-2";
-
+    link.href = `/account/profile?userId=${userId}`
+    
     var imgSpan = document.createElement("span");
     var img = document.createElement("img");
     img.src = "favicon.ico";

@@ -139,7 +139,7 @@ namespace MeChat.Areas.Identity.Pages.Account
                     Input = new InputModel
                     {
                         Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                        DisplayName = ProviderDisplayName
+                        DisplayName = string.Empty
                     };
                 }
                 return Page();

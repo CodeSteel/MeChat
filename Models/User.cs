@@ -5,6 +5,8 @@ namespace MeChat.Models;
 public class User : IdentityUser<Guid>
 {
     public string DisplayName { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
     
     public ICollection<User> Friends { get; } = new List<User>();
     

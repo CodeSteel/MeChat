@@ -23,7 +23,7 @@
         }
     </script>
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/chat.js"></script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
 }
 
 <div class="flex justify-between h-full">
@@ -32,7 +32,7 @@
             @foreach (var group in groupsWithUser)
             {
                 <a asp-action="Index" asp-controller="Home" asp-route-groupId="@group.Id" class="px-5 h-[60px] flex flex-col bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
-                    <p class="text-white text-2xl my-auto">@group.Name</p>
+                    <p class="text-white text-xl my-auto text-nowrap overflow-clip">@group.Name</p>
                 </a>
             }
             <br/>
@@ -67,7 +67,7 @@
                 {
                     <p class="flex items-center space-x-1 ">
                         <span class="text-true-gray-400 text-sm">@chat.CreatedAt</span>
-                        <a class="flex items-center space-x-2">
+                        <a asp-action="Profile" asp-controller="Account" asp-route-userId="@chat.PostedBy.Id" class="flex items-center space-x-2">
                             <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
                             <span class="text-lg font-bold">@chat.PostedBy.DisplayName: </span>
                         </a>
