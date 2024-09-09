@@ -1,12 +1,16 @@
-﻿@using System.Security.Claims
-@using Microsoft.AspNetCore.Identity
-@{
-    UserManager<User>? userManager = Context.RequestServices.GetService<UserManager<User>>();
-    User? me = await userManager?.GetUserAsync(new ClaimsPrincipal(User.Identity));
-}
+﻿@model User
 
-<main>
-    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+<main class="m-auto h-full w-full text-white flex flex-col justify-between p-4">
+    <form asp-controller="Account" asp-action="SaveAccount" class="w-fit flex flex-col m-auto">
+        <div class="flex flex-col w-fit space-y-2">
+            <label class="font-bold">Display Name</label>
+            <input class="form-control" asp-for="DisplayName"/>
+        </div>
+        
+        <input type="submit" value="Save" class="hover:border-brand-50/[.7] border border-brand-50/[0.3] duration-300 transition-all rounded bg-brand-950 px-4 py-2 mt-5 cursor-pointer"/>
+    </form>
+    
+    <form class="form-inline mx-auto" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
         <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
     </form>
 </main>

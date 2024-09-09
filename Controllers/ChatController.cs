@@ -26,6 +26,11 @@ public class ChatController : Controller
     [Authorize]
     public async Task<IActionResult> SendMessage(CreateChatRequest request)
     {
+        if (!request.IsValid)
+        {
+            return BadRequest($"Request is invalid.");
+        }
+        
         if (User.Identity == null)
         {
             return BadRequest($"User missing identity.");
@@ -67,6 +72,11 @@ public class ChatController : Controller
     [Authorize]
     public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
     {
+        if (!request.IsValid)
+        {
+            return BadRequest($"Request is invalid.");
+        }
+        
         if (User.Identity == null)
         {
             return BadRequest($"User missing identity.");

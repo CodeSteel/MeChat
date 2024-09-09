@@ -30,9 +30,11 @@
                     </span>
                     @if (!userIsInGroup)
                     {
-                        <a asp-action="JoinGroup" asp-controller="Chat" asp-route-groupId="@group.Id" class="border border-brand-50/[0.2] rounded px-4 py-2 transition-all duration-300 hover:border-none hover:bg-red-500">
+                        <form asp-action="JoinGroup" asp-controller="Chat" asp-route-groupId="@group.Id">
+                        <button type="submit" class="border border-brand-50/[0.2] rounded px-4 py-2 transition-all duration-300 hover:border-none hover:bg-red-500">
                             Join
-                        </a>
+                        </button>
+                        </form>
                     }
                 </div>
             </div>

@@ -3,6 +3,7 @@
 #nullable disable
 
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
@@ -87,6 +88,7 @@ namespace MeChat.Areas.Identity.Pages.Account
             public string Email { get; set; }
             
             [Required]
+            [DisplayName("Display Name")]
             [StringLength(25, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             public string DisplayName { get; set; }
         }

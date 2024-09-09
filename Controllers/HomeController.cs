@@ -21,13 +21,9 @@ public class HomeController : Controller
         _userManager = userManager;
     }
     
+    [Authorize]
     public async Task<IActionResult> Index(Guid? groupId)
     {
-        if (!User.Identity.IsAuthenticated)
-        {
-            return Redirect("/Identity/Account/Login");
-        }
-        
         User? user = await _dataContext.Users.Include(x => x.ChatGroups).ThenInclude(x => x.Users).FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
         if (user == null)
         {
@@ -35,7 +31,7 @@ public class HomeController : Controller
         }
 
         List<ChatGroup> groupsWithUser = user.ChatGroups.ToList();
-        ChatGroup selectedGroup = groupsWithUser[0];
+        ChatGroup? selectedGroup = groupsWithUser.Count > 0 ? groupsWithUser[0] : null;
         
         if (groupId != null)
         {
@@ -43,10 +39,13 @@ public class HomeController : Controller
             if (group != null)
                 selectedGroup = group;
         }
-        
-        await _dataContext.Entry(selectedGroup)
-            .Collection(b => b.Chats)
-            .LoadAsync();
+
+        if (selectedGroup != null)
+        {
+            await _dataContext.Entry(selectedGroup)
+                .Collection(b => b.Chats)
+                .LoadAsync();
+        }
 
         IndexResult newIndex = new IndexResult()
         {

@@ -1,0 +1,12 @@
+﻿@model User
+
+@if (Model != null)
+{
+    <main class="w-full h-full flex">
+        <div class="text-white border border-brand-50/[0.2] rounded p-8 m-auto w-[500px]">
+            <div>
+                @Model.DisplayName
+            </div>
+        </div>
+    </main>
+}
