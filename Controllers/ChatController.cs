@@ -92,7 +92,8 @@ public class ChatController : Controller
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
-            Public = true
+            Type = ChatGroupType.PublicGroup,
+            Owner = requestUser
         };
         newChatGroup.Users.Add(requestUser);
 

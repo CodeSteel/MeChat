@@ -40,6 +40,7 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
                 .HasForeignKey(e => e.GroupId);
             ent.HasMany(e => e.Users)
                 .WithMany(e => e.ChatGroups);
+            ent.HasOne(e => e.Owner);
         });
         
         modelBuilder.Entity<User>(ent =>

@@ -68,11 +68,11 @@ public class HomeController : Controller
         List<ChatGroup> publicGroups;
         if (groupCollection != null && !string.IsNullOrEmpty(groupCollection.Search))
         {
-            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Public && x.Name.ToLower().Contains(groupCollection.Search.ToLower())).ToList() ?? new List<ChatGroup>();
+            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Type == ChatGroupType.PublicGroup && x.Name.ToLower().Contains(groupCollection.Search.ToLower())).ToList() ?? new List<ChatGroup>();
         }
         else
         {
-            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Public).ToList() ?? new List<ChatGroup>();
+            publicGroups = _dataContext?.ChatGroups.Include(x => x.Users).Where(x => x.Type == ChatGroupType.PublicGroup).ToList() ?? new List<ChatGroup>();
         }
         
         return View(new FindGroupResult()
