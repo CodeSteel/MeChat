@@ -70,7 +70,7 @@ IList<ChatGroup> groupsWithUser = (Model != null && Model.GroupsWithUser != null
                 @if (chat.PostedBy != null)
                 {
                 <a asp-action="Profile" asp-controller="Account" asp-route-userId="@chat.PostedBy.Id" class="flex items-center space-x-2">
-                    <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
+                    <span><img class="ml-2" src="@chat.PostedBy.ProfilePicture.Path" width="26" height="26" /></span>
                     <span class="text-lg font-bold @(chat.PostedBy.Email == User.Identity.Name?"text-brand-500":"")">@chat.PostedBy.DisplayName: </span>
                 </a>
                 }

@@ -29,5 +29,13 @@
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.7.3" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
     </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\251cf56f-9a40-4f1d-bb29-00a951abc110\S&amp;BoxTerryHop.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\uploads\" />
+    </ItemGroup>
     
 </Project>

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using MeChat.Models;
+using MeChat.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -31,13 +32,15 @@ namespace MeChat.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<User> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly FileUploader _fileUploader;
 
         public ExternalLoginModel(
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             IUserStore<User> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            FileUploader fileUploader)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -45,6 +48,7 @@ namespace MeChat.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            _fileUploader = fileUploader;
         }
 
         /// <summary>
@@ -54,6 +58,9 @@ namespace MeChat.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
+        [BindProperty]
+        public IFormFile ProfileImageUpload { get; set; }
+        
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -160,8 +167,15 @@ namespace MeChat.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
+                user.Id = Guid.NewGuid();
                 user.DisplayName = Input.DisplayName;
+                
+                if (ProfileImageUpload != null)
+                {
+                    FileUpload profileImage = await _fileUploader.UploadFile(user, ProfileImageUpload);
+                    user.ProfilePicture = profileImage;
+                }
+                
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
@@ -219,7 +233,21 @@ namespace MeChat.Areas.Identity.Pages.Account
                     $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
             }
         }
-
+        
+        private FileUpload CreateFileUpload()
+        {
+            try
+            {
+                return Activator.CreateInstance<FileUpload>();
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(User)}'. " +
+                                                    $"Ensure that '{nameof(User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                                                    $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
+            }
+        }
+        
         private IUserEmailStore<User> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)

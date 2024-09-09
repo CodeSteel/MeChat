@@ -27,8 +27,12 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration.GetSection("DiscordKeys:ClientSecret").Value;
 });
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddTransient<IEmailSender, EmailSender>();
+}
+
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
@@ -39,6 +43,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDataContext>();
 builder.Services.AddDbContext<ApplicationDataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<FileUploader>();
 
 var app = builder.Build();
 

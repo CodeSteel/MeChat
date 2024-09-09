@@ -12,6 +12,7 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
     public DbSet<ChatGroup> ChatGroups { get; set; }
     public DbSet<Chat> Chats { get; set; }
     public DbSet<AppStatistic> AppStatistics { get; set; }
+    public DbSet<FileUpload> FileUploads { get; set; }
 
     public ApplicationDataContext(DbContextOptions<ApplicationDataContext> options, IConfiguration configuration) : base(options)
     {

@@ -8,7 +8,7 @@
     <div class="text-white border border-brand-50/[0.2] rounded p-8 m-auto w-[500px]">
         <p class="text-2xl font-bold mb-4">Register</p>
 
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="flex flex-col space-y-3">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="flex flex-col space-y-3" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-red-500" role="alert"></div>
             <div class="flex flex-col space-y-1">
                 <label asp-for="Input.Email">Email</label>
@@ -29,6 +29,11 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-red-500"></span>
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/>
+            </div>
+            <div class="flex flex-col mb-3 space-y-1">
+                <label asp-for="ProfileImageUpload">Profile Image</label>
+                <span asp-validation-for="ProfileImageUpload" class="text-red-500"></span>
+                <input asp-for="ProfileImageUpload" class="form-control p-4 border-brand-50/[0.3]" type="file" aria-required="true" />
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Create Account</button>
         </form>
