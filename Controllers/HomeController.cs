@@ -22,7 +22,13 @@ public class HomeController : Controller
     }
     
     [Authorize]
-    public async Task<IActionResult> Index(Guid? groupId)
+    public async Task<IActionResult> Index()
+    {
+        AppStatistic? appStatistic = await _dataContext.AppStatistics.FirstOrDefaultAsync();
+        return View(appStatistic);
+    }
+
+    public async Task<IActionResult> Dashboard(Guid? groupId)
     {
         User? user = await _dataContext.Users.Include(x => x.ChatGroups).ThenInclude(x => x.Users).FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
         if (user == null)
@@ -47,7 +53,7 @@ public class HomeController : Controller
                 .LoadAsync();
         }
 
-        IndexResult newIndex = new IndexResult()
+        DashboardResults newIndex = new DashboardResults()
         {
             Selection = groupId ?? Guid.Empty,
             GroupsWithUser = groupsWithUser,
@@ -56,27 +62,12 @@ public class HomeController : Controller
         return View(newIndex);
     }
 
-    public async Task<IActionResult> Dashboard()
-    {
-        AppStatistic? appStatistic = await _dataContext.AppStatistics.FirstOrDefaultAsync();
-        if (appStatistic == null)
-        {
-            return View();
-        }
-        DashboardResults results = new DashboardResults()
-        {
-            GroupCount = appStatistic.GroupsCreated,
-            UserCount = appStatistic.UsersCreated,
-            ChatCount = appStatistic.ChatsCreated
-        };
-        return View(results);
-    }
-
     [Authorize]
     public IActionResult CreateGroup()
     {
         return View();
     }
+    
 
     [Authorize]
     public IActionResult FindGroup(FindGroupResult? groupCollection)

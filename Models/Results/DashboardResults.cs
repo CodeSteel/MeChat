@@ -2,9 +2,7 @@
 
 public class DashboardResults
 {
-    public int UserCount { get; set; }
-    
-    public int GroupCount { get; set; }
-    
-    public int ChatCount { get; set; }
+    public Guid Selection { get; set; }
+    public IList<ChatGroup> GroupsWithUser { get; set; }
+    public ChatGroup? SelectedGroup { get; set; }
 }

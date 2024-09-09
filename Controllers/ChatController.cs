@@ -110,7 +110,7 @@ public class ChatController : Controller
         await _dataContext.ChatGroups.AddAsync(newChatGroup);
         await _dataContext.SaveChangesAsync();
         
-        return RedirectToAction("Index", "Home", new {GroupId = newChatGroup.Id});
+        return RedirectToAction("Dashboard", "Home", new {GroupId = newChatGroup.Id});
     }
     
     [HttpPost("group/leave")]

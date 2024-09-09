@@ -1,134 +1,32 @@
-﻿@model IndexResult;
-
-@{
-    ChatGroup? selectedGroup = Model?.SelectedGroup;
-    IList<ChatGroup> groupsWithUser = (Model != null && Model.GroupsWithUser != null ? Model.GroupsWithUser : new List<ChatGroup>());
+﻿@{
+ViewData["Title"] = "Dashboard";
 }
+@model AppStatistic
 
-@section Scripts
-{
-    <script>
-        const messageInput = document.getElementById("messageInput");
-        const sendMessage = () =>
-        {
-            if (messageInput.value === "") return;
-            $.ajax({
-                url: '@Url.Action("SendMessage", "Chat")',
-                type: 'POST',
-                data: {
-                    GroupId: "@selectedGroup?.Id",
-                    Body: messageInput.value
-                }
-            });
-        }
-    </script>
-    <script src="~/js/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/chat.js" asp-append-version="true"></script>
-}
-
-<div class="flex justify-between h-full">
-    <div class="w-[250px] relative h-full bg-brand-900 border-r border-brand-100/[0.1] shadow-xl">
-        <div class="groups">
-            @foreach (var group in groupsWithUser)
-            {
-                <a asp-action="Index" asp-controller="Home" asp-route-groupId="@group.Id" class="px-5 h-[60px] flex flex-col bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
-                    <p class="text-white text-xl my-auto text-nowrap overflow-clip">@group.Name</p>
-                </a>
-            }
-            <br/>
-            <a asp-action="CreateGroup" asp-controller="Home" class="w-full px-5 h-[60px] flex flex-col bg-brand-900 border-b border-t border-brand-50/[0.2] shadow-md">
-                <div class="text-white text-2xl my-auto flex flex-row items-center space-x-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                    </svg>
-                    <p class="text-xl">Create Group</p>
+<main class="h-full flex flex-col items-center">
+    <!-- Hero -->
+    <div class="p-8 text-white flex flex-col items-center mt-[200px] w-[500px] lg:w-[900px]">
+        <div class="flex w-full justify-between">
+            <div class="flex space-x-10 font-bold items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0867 21.3877L13.6288 20.4718C14.0492 19.7614 14.2595 19.4062 14.5972 19.2098C14.9349 19.0134 15.36 19.0061 16.2104 18.9915C17.4658 18.9698 18.2531 18.8929 18.9134 18.6194C20.1386 18.1119 21.1119 17.1386 21.6194 15.9134C22 14.9946 22 13.8297 22 11.5V10.5C22 7.22657 22 5.58985 21.2632 4.38751C20.8509 3.71473 20.2853 3.14908 19.6125 2.7368C18.4101 2 16.7734 2 13.5 2H10.5C7.22657 2 5.58985 2 4.38751 2.7368C3.71473 3.14908 3.14908 3.71473 2.7368 4.38751C2 5.58985 2 7.22657 2 10.5V11.5C2 13.8297 2 14.9946 2.3806 15.9134C2.88807 17.1386 3.86144 18.1119 5.08658 18.6194C5.74689 18.8929 6.53422 18.9698 7.78958 18.9915C8.63992 19.0061 9.06509 19.0134 9.40279 19.2098C9.74049 19.4063 9.95073 19.7614 10.3712 20.4718L10.9133 21.3877C11.3965 22.204 12.6035 22.204 13.0867 21.3877ZM12 6.25C12.4142 6.25 12.75 6.58579 12.75 7V15C12.75 15.4142 12.4142 15.75 12 15.75C11.5858 15.75 11.25 15.4142 11.25 15V7C11.25 6.58579 11.5858 6.25 12 6.25ZM8.75 9C8.75 8.58579 8.41421 8.25 8 8.25C7.58579 8.25 7.25 8.58579 7.25 9V13C7.25 13.4142 7.58579 13.75 8 13.75C8.41421 13.75 8.75 13.4142 8.75 13V9ZM16 8.25C16.4142 8.25 16.75 8.58579 16.75 9V13C16.75 13.4142 16.4142 13.75 16 13.75C15.5858 13.75 15.25 13.4142 15.25 13V9C15.25 8.58579 15.5858 8.25 16 8.25Z" fill="#fff"/>
+                </svg>
+                <div class="flex flex-col space-y-3">
+                    <p class="text-5xl">Chat with your friends,</p>
+                    <p class="text-4xl text-brand-500">that's MeChat.</p>
                 </div>
-            </a>
-            <a asp-action="FindGroup" asp-controller="Home" class="mt-4 w-full px-5 h-[60px] flex flex-col bg-brand-900 border-b border-t border-brand-50/[0.2] shadow-md">
-                <div class="text-white text-2xl my-auto flex flex-row items-center space-x-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
-                        <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
-                    </svg>
-                    <p class="text-xl">Find a Group</p>
-                </div>
-            </a>
+            </div>
+            <div class="text-3xl text-true-gray-300 text-nowrap my-auto">
+                <p><span class="text-brand-500">@Model.GroupsCreated</span> groups made,</p>
+                <p><span class="text-brand-500">@Model.UsersCreated</span> users registered,</p>
+                <p>& <span class="text-brand-500">@Model.ChatsCreated</span> chats sent.</p>
+            </div>
         </div>
+        <form asp-action="Dashboard" asp-controller="Home" class="mt-[100px] w-full">
+            <button type="submit" class="border border-brand-50/[0.3] shadow-2xl w-full transition-all duration-300 bg-brand-950 hover:border-none hover:bg-brand-800 text-xl p-4 rounded">Go to App</button>
+        </form>
     </div>
-    
-    <div class="w-full bg-brand-900 m-4 p-4 rounded-lg shadow-xl text-white flex flex-col justify-between">
-        @if (selectedGroup != null)
-        {
-            <div>
-                <p class="text-2xl mb-2">@selectedGroup.Name</p>
-            </div>
-            <div id="chatbox" class=" h-full mb-4 overflow-y-scroll p-2 scrollbar">
-                @foreach (Chat chat in selectedGroup.Chats)
-                {
-                    <p class="flex items-center space-x-1 ">
-                        <span class="text-true-gray-400 text-sm">@chat.CreatedAt</span>
-                        @if (chat.PostedBy != null)
-                        {
-                            <a asp-action="Profile" asp-controller="Account" asp-route-userId="@chat.PostedBy.Id" class="flex items-center space-x-2">
-                                <span><img class="ml-2" src="favicon.ico" width="16" height="16" /></span>
-                                <span class="text-lg font-bold @(chat.PostedBy.Email == User.Identity.Name?"text-brand-500":"")">@chat.PostedBy.DisplayName: </span>
-                            </a>
-                        }
-                        else
-                        {
-                            <span>
-                                <strong class="ml-4">Chat:</strong>
-                            </span>
-                        }
-                        <span class="text-md">@chat.Body</span>
-                    </p>
-                }
-            </div>
-            <div id="messageForm" class="w-full flex space-x-5">
-                <input id="messageInput" placeholder="type something..." type="text" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl w-full" />
-                <button type="button" id="sendMessage" onclick="sendMessage()" class="bg-transparent rounded border border-brand-50/[0.3] shadow-xl h-full w-fit px-24">Send</button>
-            </div>
-        }
+    <div class="text-white items-center absolute bottom-0 mt-auto w-full bg-brand-950 backdrop-blur lg:z-50 border-t border-brand-50/[0.06] supports-backdrop-blur:bg-white/95 shadow-lg h-[50px] flex">
+        <p class="mx-auto text-lg">&#169; <span class="text-base">MeChat, 2024</span></p>
     </div>
-
-    <div class="w-[250px] relative h-full bg-brand-900 border-l-2 border-brand-100/[0.2] shadow-xl">
-        <div class="groups flex flex-col justify-between">
-            @if (selectedGroup != null)
-            {
-                <div>
-                    <a asp-controller="Account" asp-action="Profile" asp-route-userId="@selectedGroup.Owner.Id" class="px-5 h-[60px] flex flex-row items-center space-x-2 bg-brand-900 border-b border-brand-50/[0.2] shadow-md">
-                        @if (selectedGroup.Owner.Id == selectedGroup.Owner.Id)
-                        {
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 8L6 20H18L20 8M4 8L5.71624 9.37299C6.83218 10.2657 7.39014 10.7121 7.95256 10.7814C8.4453 10.8421 8.94299 10.7173 9.34885 10.4314C9.81211 10.1051 10.0936 9.4483 10.6565 8.13476L12 5M4 8C4.55228 8 5 7.55228 5 7C5 6.44772 4.55228 6 4 6C3.44772 6 3 6.44772 3 7C3 7.55228 3.44772 8 4 8ZM20 8L18.2838 9.373C17.1678 10.2657 16.6099 10.7121 16.0474 10.7814C15.5547 10.8421 15.057 10.7173 14.6511 10.4314C14.1879 10.1051 13.9064 9.4483 13.3435 8.13476L12 5M20 8C20.5523 8 21 7.55228 21 7C21 6.44772 20.5523 6 20 6C19.4477 6 19 6.44772 19 7C19 7.55228 19.4477 8 20 8ZM12 5C12.5523 5 13 4.55228 13 4C13 3.44772 12.5523 3 12 3C11.4477 3 11 3.44772 11 4C11 4.55228 11.4477 5 12 5ZM12 4H12.01M20 7H20.01M4 7H4.01" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        }
-                        <p class="text-white  my-auto">@selectedGroup.Owner.DisplayName</p>
-                    </a>
-                    
-                    @foreach (User user in selectedGroup.Users)
-                    {
-                        @if (selectedGroup.Owner.Id != user.Id)
-                        {
-                            <a asp-controller="Account" asp-action="Profile" asp-route-userId="@user.Id" class="px-5 h-[60px] flex flex-row items-center space-x-2 bg-brand-900 shadow-md">
-                                <div>
-                                    <p class="text-white ">@user.DisplayName</p>
-                                </div>
-                            </a>
-                        }
-                    }
-                </div>
-                <form asp-controller="Chat" asp-action="LeaveGroup" asp-route-groupId=@selectedGroup.Id>
-                    <button type="submit" class="w-full px-5 h-[60px] flex flex-col bg-brand-900 border-b border-t border-brand-50/[0.2] shadow-md">
-                        <div class="text-white text-2xl my-auto flex flex-row items-center space-x-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
-                                <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
-                            </svg>
-                            <p class="text-xl">Leave Group</p>
-                        </div>
-                    </button>
-                </form>
-            }
-        </div>
-    </div>
-</div>
+</main>
