@@ -13,6 +13,7 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
     public DbSet<Chat> Chats { get; set; }
     public DbSet<AppStatistic> AppStatistics { get; set; }
     public DbSet<FileUpload> FileUploads { get; set; }
+    public DbSet<UserRelationship> UserRelationships { get; set; }
 
     public ApplicationDataContext(DbContextOptions<ApplicationDataContext> options, IConfiguration configuration) : base(options)
     {
@@ -50,6 +51,9 @@ public class ApplicationDataContext : IdentityDbContext<User, IdentityRole<Guid>
             ent.HasKey(e => e.Id);
             ent.HasMany(e => e.ChatGroups)
                 .WithMany(e => e.Users);
+            ent.HasMany(e => e.UserRelationships)
+                .WithOne(e => e.Owner)
+                .HasForeignKey(e => e.OwnerId);
         });
 
         modelBuilder.Entity<AppStatistic>(ent =>

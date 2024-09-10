@@ -11,11 +11,11 @@ public enum ChatGroupType
 public class ChatGroup
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     
-    public string Name { get; set; }
+    public string? Name { get; set; }
     
-    public ChatGroupType Type { get; set; }
+    public ChatGroupType Type { get; set; } 
     
     public ICollection<Chat> Chats { get; } = new List<Chat>();
 

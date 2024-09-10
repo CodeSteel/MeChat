@@ -14,9 +14,7 @@ public class User : IdentityUser<Guid>
     [NotMapped]
     public IFormFile ProfilePictureUpload { get; set; } = null!;
     
-    public ICollection<User> Friends { get; } = new List<User>();
-    
-    public ICollection<User> FriendRequests { get; } = new List<User>();
+    public ICollection<UserRelationship> UserRelationships { get; } = new List<UserRelationship>();
     
     public ICollection<ChatGroup> ChatGroups { get; } = new List<ChatGroup>();
 }

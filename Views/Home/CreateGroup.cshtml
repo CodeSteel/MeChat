@@ -2,9 +2,10 @@
 
 <main class="w-full h-full flex text-white">
 <div class="m-auto">
-    <form asp-controller="Chat" asp-action="CreateGroup" class="flex flex-col text-white" >
-        <label class="mb-2">Name</label>
-        <input id="nameInput" class="mb-6 bg-transparent rounded" asp-for="Name" />
+    <form asp-controller="Chat" asp-action="CreateGroup" method="post" class="flex flex-col text-white" asp-route-redirectUrl="/Home/Dashboard?groupId=" >
+        <label asp-for="Name" class="mb-2">Name</label>
+        <span asp-validation-for="Name" class="text-red-500"></span>
+        <input id="nameInput" class="mb-6 bg-transparent rounded" asp-for="Name"  />
     
         <input class="p-2 rounded btn cursor-pointer" type="submit" value="Create Group"/>
     </form>

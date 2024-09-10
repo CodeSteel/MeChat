@@ -24,9 +24,9 @@ public class ChatController : Controller
 
     [HttpPost("group/message")]
     [Authorize]
-    public async Task<IActionResult> SendMessage(CreateChatRequest request)
+    public async Task<IActionResult> SendMessage(CreateChatRequest? request, string? redirectUrl)
     {
-        if (!request.IsValid)
+        if (request == null || !request.IsValid)
         {
             return BadRequest($"Request is invalid.");
         }
@@ -70,14 +70,14 @@ public class ChatController : Controller
         await _dataContext.Chats.AddAsync(newChat);
         await _dataContext.SaveChangesAsync();
 
-        return Ok();
+        return redirectUrl != null ? Redirect(redirectUrl) : Ok();
     }
     
     [HttpPost("group/create")]
     [Authorize]
-    public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
+    public async Task<IActionResult> CreateGroup(CreateGroupRequest? request, string? redirectUrl)
     {
-        if (!request.IsValid)
+        if (request == null || !request.IsValid)
         {
             return BadRequest($"Request is invalid.");
         }
@@ -95,96 +95,130 @@ public class ChatController : Controller
         
         ChatGroup newChatGroup = new ChatGroup()
         {
-            Id = Guid.NewGuid(),
             Name = request.Name,
             Type = ChatGroupType.PublicGroup,
             Owner = requestUser
         };
         newChatGroup.Users.Add(requestUser);
         
+        Chat newGroupChat = new Chat()
+        {
+            Group = newChatGroup,
+            Body = $"{requestUser.DisplayName} created this goup."
+        };
+            
         AppStatistic stats = await _dataContext.AppStatistics.FirstAsync();
         _dataContext.Update(stats);
         
         stats.GroupsCreated++;
 
         await _dataContext.ChatGroups.AddAsync(newChatGroup);
+        await _dataContext.Chats.AddAsync(newGroupChat);
         await _dataContext.SaveChangesAsync();
         
-        return RedirectToAction("Dashboard", "Home", new {GroupId = newChatGroup.Id});
+        return redirectUrl != null ? Redirect(redirectUrl + newChatGroup.Id) : Ok();
     }
     
     [HttpPost("group/leave")]
     [Authorize]
-    public async Task<IActionResult> LeaveGroup(Guid groupId)
+    public async Task<IActionResult> LeaveGroup(Guid? groupId, string? redirectUrl)
     {
-        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
-        if (user != null)
+        if (groupId == null || groupId.Value == Guid.Empty)
         {
-            ChatGroup? requestedGroup = await _dataContext.ChatGroups.Include(x => x.Users)
-                .FirstOrDefaultAsync(x => x.Id == groupId);
-            if (requestedGroup != null)
-            {
-                User? foundUser = requestedGroup.Users.FirstOrDefault(x => x.Id == user.Id);
-                if (foundUser != null)
-                {
-                    if (requestedGroup.Users.Count > 1)
-                    {
-                        _dataContext.ChatGroups.Update(requestedGroup);
-                        requestedGroup.Users.Remove(user);
-                        
-                        Chat leaveChat = new Chat()
-                        {
-                            Group = requestedGroup,
-                            Body = $"{user.DisplayName} left the group."
-                        };
-
-                        await _dataContext.Chats.AddAsync(leaveChat);
-                    }
-                    else
-                    {
-                        _dataContext.ChatGroups.Remove(requestedGroup);
-                    }
-                    
-                    await _dataContext.SaveChangesAsync();
-                }
-            }
+            return BadRequest("GroupId is invalid.");
         }
-        return RedirectToAction("Index", "Home");
+        
+        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
+        if (user == null)
+        {
+            return BadRequest("User is invalid.");
+        }
+
+        ChatGroup? requestedGroup = await _dataContext.ChatGroups
+            .Include(x => x.Users)
+            .FirstOrDefaultAsync(x => x.Id == groupId);
+
+        if (requestedGroup == null)
+        {
+            return BadRequest("Request group is invalid.");
+        }
+
+        if (requestedGroup is { Type: ChatGroupType.DirectMessage })
+        {
+            return BadRequest("Can't leave direct message groups.");
+        }
+
+        User? foundUser = requestedGroup.Users.FirstOrDefault(x => x.Id == user.Id);
+        if (foundUser == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        if (requestedGroup.Users.Count > 1)
+        {
+            _dataContext.ChatGroups.Update(requestedGroup);
+            requestedGroup.Users.Remove(user);
+            
+            Chat leaveChat = new Chat()
+            {
+                Group = requestedGroup,
+                Body = $"{user.DisplayName} left the group."
+            };
+
+            await _dataContext.Chats.AddAsync(leaveChat);
+        }
+        else
+        {
+            _dataContext.ChatGroups.Remove(requestedGroup);
+        }
+        
+        await _dataContext.SaveChangesAsync();
+        
+        return redirectUrl != null ? Redirect(redirectUrl) : Ok();
     }
     
     [HttpPost("group/join")]
     [Authorize]
-    public async Task<IActionResult> JoinGroup(Guid groupId, string? redirectUrl)
+    public async Task<IActionResult> JoinGroup(Guid? groupId, string? redirectUrl)
     {
-        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
-        if (user != null)
+        if (groupId == null || groupId.Value == Guid.Empty)
         {
-            ChatGroup? requestedGroup = await _dataContext.ChatGroups.Include(x => x.Users)
-                .FirstOrDefaultAsync(x => x.Id == groupId);
-            if (requestedGroup != null)
+            return BadRequest("GroupId is invalid.");
+        }
+        
+        User? user = await _userManager.GetUserAsync(new ClaimsPrincipal(User.Identity));
+        if (user == null)
+        {
+            return BadRequest("User is invalid.");
+        }
+        
+        ChatGroup? requestedGroup = await _dataContext.ChatGroups
+            .Include(x => x.Users)
+            .FirstOrDefaultAsync(x => x.Id == groupId);
+        
+        if (requestedGroup != null)
+        {
+            User? foundUser = requestedGroup.Users.FirstOrDefault(x => x.Id == user.Id);
+            if (foundUser == null)
             {
-                User? foundUser = requestedGroup.Users.FirstOrDefault(x => x.Id == user.Id);
-                if (foundUser == null)
-                {
-                    _dataContext.ChatGroups.Update(requestedGroup);
-                    requestedGroup.Users.Add(user);
+                _dataContext.ChatGroups.Update(requestedGroup);
+                requestedGroup.Users.Add(user);
 
-                    Chat welcomeChat = new Chat()
-                    {
-                        Group = requestedGroup,
-                        Body = $"{user.DisplayName} joined the group."
-                    };
-
-                    await _dataContext.Chats.AddAsync(welcomeChat);
-                    await _dataContext.SaveChangesAsync();
-                }
-                else
+                Chat welcomeChat = new Chat()
                 {
-                    return redirectUrl != null ? Redirect(redirectUrl) : RedirectToAction("FindGroup", "Home");
-                }
+                    Group = requestedGroup,
+                    Body = $"{user.DisplayName} joined the group."
+                };
+
+                await _dataContext.Chats.AddAsync(welcomeChat);
+                await _dataContext.SaveChangesAsync();
+            }
+            else
+            {
+                return redirectUrl != null ? Redirect(redirectUrl) : Ok();
             }
         }
 
-        return redirectUrl != null ? Redirect(redirectUrl) : RedirectToAction("Index", "Home", new {GroupId = groupId});
+        return redirectUrl != null ? Redirect(redirectUrl) : Ok();
     }
 }

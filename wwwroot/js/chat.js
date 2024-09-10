@@ -2,7 +2,7 @@
 var chatbox = document.getElementById("chatbox");
 let msg;
 
-connection.on("ReceiveMessage", function (username, userId, createdAt, message) {
+connection.on("ReceiveMessage", function (username, userId, userProfilePic, createdAt, message) {
     var item = document.createElement("p");
     item.className = "flex items-center space-x-1"
     
@@ -18,10 +18,10 @@ connection.on("ReceiveMessage", function (username, userId, createdAt, message) 
     
     var imgSpan = document.createElement("span");
     var img = document.createElement("img");
-    img.src = "favicon.ico";
+    img.src = userProfilePic;
     img.className = "ml-2";
-    img.width = "16";
-    img.height = "16";
+    img.width = "26";
+    img.height = "26";
     imgSpan.appendChild(img);
     
     link.appendChild(imgSpan);

@@ -27,8 +27,7 @@ public class AccountController : Controller
     public async Task<IActionResult> Index()
     {
         User? user = await _dataContext.Users
-            .Include(x => x.Friends)
-            .Include(x => x.FriendRequests)
+            .Include(x => x.UserRelationships)
             .Include(x => x.ProfilePicture)
             .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
         return View(user);
@@ -38,7 +37,8 @@ public class AccountController : Controller
     public async Task<IActionResult> Profile(Guid userId)
     {
         User? user = await _dataContext.Users
-            .Include(x => x.Friends)
+            .Include(x => x.UserRelationships)
+            .Include(x => x.ProfilePicture)
             .Include(x => x.ChatGroups)
             .ThenInclude(x => x.Users)
             .FirstOrDefaultAsync(x => x.Id == userId);

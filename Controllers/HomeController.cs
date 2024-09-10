@@ -28,6 +28,54 @@ public class HomeController : Controller
         return View(appStatistic);
     }
 
+    public async Task<IActionResult> DirectMessage(Guid? userId)
+    {
+        if (userId == null)
+        {
+            return BadRequest();
+        }
+        
+        User? user = await _dataContext.Users
+            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+        
+        if (user == null)
+        {
+            return BadRequest();
+        }
+        
+        User? targetUser = await _dataContext.Users
+            .FirstOrDefaultAsync(x => x.Id == userId);
+        
+        if (targetUser == null)
+        {
+            return BadRequest();
+        }
+
+        ChatGroup? chatGroup = await _dataContext.ChatGroups
+            .FirstOrDefaultAsync(x =>
+                x.Type == ChatGroupType.DirectMessage && x.Users.Contains(user) && x.Users.Contains(targetUser));
+
+        Guid id;
+        
+        if (chatGroup == null)
+        {
+            ChatGroup groupChat = new ChatGroup();
+
+            id = groupChat.Id;
+            
+            groupChat.Users.Add(user);
+            groupChat.Users.Add(targetUser);
+            await _dataContext.ChatGroups.AddAsync(groupChat);
+            await _dataContext.SaveChangesAsync();
+        }
+        else
+        {
+            id = chatGroup.Id;
+        }
+        
+        return RedirectToAction("Dashboard", "Home", new { groupId= id });
+    }
+
     public async Task<IActionResult> Dashboard(Guid? groupId)
     {
         User? user = await _dataContext.Users.Include(x => x.ChatGroups).ThenInclude(x => x.Users).FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
@@ -38,6 +86,9 @@ public class HomeController : Controller
 
         List<ChatGroup> groupsWithUser = user.ChatGroups.ToList();
         ChatGroup? selectedGroup = null;
+
+        if (groupsWithUser.Count > 0)
+            selectedGroup = groupsWithUser[0];
         
         if (groupId != null)
         {

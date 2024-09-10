@@ -33,9 +33,5 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\uploads\251cf56f-9a40-4f1d-bb29-00a951abc110\S&amp;BoxTerryHop.png" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="wwwroot\uploads\" />
-    </ItemGroup>
     
 </Project>
