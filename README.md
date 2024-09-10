@@ -13,7 +13,7 @@
 
 ## Screenshots
 
-### Swagger Calls
+### API Calls
 
 ![image](https://github.com/user-attachments/assets/2e05828c-3a9f-4072-909f-1d600e0de278)
 
