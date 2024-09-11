@@ -1,8 +1,11 @@
 ﻿var connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 var chatbox = document.getElementById("chatbox");
+var groupId = document.getElementById("groupId").textContent;
 let msg;
 
-connection.on("ReceiveMessage", function (username, userId, userProfilePic, createdAt, message) {
+connection.on("ReceiveMessage", function (username, userId, userProfilePic, createdAt, message, sentGroupId) {
+    if (sentGroupId !== groupId) return;
+    
     var item = document.createElement("p");
     item.className = "flex items-center space-x-1"
     
@@ -53,7 +56,7 @@ document.getElementById("sendMessage").addEventListener("click", function (event
     if (messageInput.value.trim() === "") return;
     
     msg = messageInput.value;
-    connection.invoke("Send", messageInput.value);
+    connection.invoke("Send", groupId, messageInput.value);
     event.preventDefault();
     messageInput.value = "";
 });
@@ -68,7 +71,9 @@ function keyPress(e){
     }
 }
 
-connection.start();
+connection.start().then(() => {
+    connection.invoke("AddToGroup", groupId);
+});
+
 chatbox.scrollTop = chatbox.scrollHeight;
 document.getElementById("messageInput").focus();
-
