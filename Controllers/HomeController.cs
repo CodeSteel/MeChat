@@ -21,7 +21,6 @@ public class HomeController : Controller
         _userManager = userManager;
     }
     
-    [Authorize]
     public async Task<IActionResult> Index()
     {
         AppStatistic? appStatistic = await _dataContext.AppStatistics.FirstOrDefaultAsync();
@@ -76,9 +75,14 @@ public class HomeController : Controller
         return RedirectToAction("Dashboard", "Home", new { groupId= id });
     }
 
+    [Authorize]
     public async Task<IActionResult> Dashboard(Guid? groupId)
     {
-        User? user = await _dataContext.Users.Include(x => x.ChatGroups).ThenInclude(x => x.Users).FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+        User? user = await _dataContext.Users
+            .Include(x => x.ChatGroups)
+            .ThenInclude(x => x.Users)
+            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+        
         if (user == null)
         {
             return View();
