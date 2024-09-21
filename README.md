@@ -1,5 +1,9 @@
 ### MeChat is a realtime chat web application developed with ASP.NET Core, SignalR, PostgreSQL, & TailwindCSS.
 
+Development Time
+
+[![wakatime](https://wakatime.com/badge/user/2d870dab-4a32-4b61-92e1-e72e79bac1da/project/2445677e-c249-47f4-988f-cb3a585928f9.svg)](https://wakatime.com/badge/user/2d870dab-4a32-4b61-92e1-e72e79bac1da/project/2445677e-c249-47f4-988f-cb3a585928f9)
+
 ## Features
 * Register & Login with Email/Password, Google, & Discord
 * Utilizes SignalR for a realtime chat experience
